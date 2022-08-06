@@ -1,10 +1,20 @@
 from django.contrib import admin, messages
 from django.db.models import QuerySet
 
-from .models import Movie
+from .models import Movie, Director,Actor, DressingRoom
 
 
 # Register your models here.
+
+admin.site.register(Director)
+admin.site.register(Actor)
+# admin.site.register(DressingRoom)
+
+# создаём новую админку, дя этого коментирем admin.site.register(DressingRoom)
+@admin.register(DressingRoom)
+class DressingRoom(admin.ModelAdmin):
+    list_display = ['floor', 'number', 'actor']
+
 
 
 # class MovieAdmin(admin.ModelAdmin):
@@ -17,7 +27,6 @@ from .models import Movie
 class RatingFilter(admin.SimpleListFilter):
     title = 'Фильтр по рейтингу'
     parameter_name = 'rating'
-
     def lookups(self, request, model_admin):
         return [
             ('<40', 'Низкий'),
@@ -25,7 +34,6 @@ class RatingFilter(admin.SimpleListFilter):
             ('от 60 до 79', 'Высокий'),
             ('>=80', 'Высочайший'),
         ]
-
     def queryset(self, request, queryset: QuerySet):
         if self.value()=='<40':
             return queryset.filter(rating__lt=40)
@@ -39,20 +47,21 @@ class RatingFilter(admin.SimpleListFilter):
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-
     # fields = ['rating', 'name']- оставляет поля
     # list_editable- изменяет поля. # ordering - сортирует список
     # list_per_page- видеть сколько будет значений на странице
     # exclude = ['year'] - скрывает поля; readonly_fields =['']-заморивает поле.
     # exclude = ['slug'],  prepopulated_fields = -предвычисляемые значения.
     prepopulated_fields = {'slug': ('name',)}
-    list_display = ['name', 'rating', 'year', 'currency', 'budget', 'rating_status']
-    list_editable = ['rating', 'year', 'currency', 'budget']
+    list_display = ['name', 'rating', 'director', 'budget', 'rating_status']
+    list_editable = ['rating', 'director', 'budget']
+    filter_horizontal = ['actors']
     ordering = ['-rating', '-name']
     list_per_page = 8
     actions = ['set_dollars', 'set_euro', 'set_rubles']
     search_fields = ['name__startswith', 'rating']
     list_filter = ['name', 'currency', RatingFilter]
+
     # Пишем патерн, для того что бы сортировать поле, в ordring=пишем, то что
     # что хотим сортировать. если хотим изенить поле rating_status, то
     # пишем, description= 'Статус'

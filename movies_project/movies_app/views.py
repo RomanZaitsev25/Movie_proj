@@ -1,13 +1,12 @@
 from django.db.models import F, Max, Min, Avg, Value
 from django.shortcuts import render, get_object_or_404
 
-from .models import Movie
+from .models import Movie, Director
 
 
 # Надо импортировать все фильмы из файла models, вызвав клаа Movie,
 # И передать его контекст render в виде словоря. Далее можем обращаться
 # к шаблону.
-
 
 
 # Create your views here.
@@ -20,9 +19,9 @@ def show_all_movie(requets):
         false_bool=Value(False),
         str_fild=Value('Hello'),
         int_fild=Value(1254),
-        new_budget=F('budget')+100,
+        new_budget=F('budget') + 100,
         rating_year=F('year') + F('rating'),
-         )
+    )
     agg = movies.aggregate(Avg('budget'), Max('rating'), Min('rating'))
     # for movie in movies:
     #     movie.save()
@@ -43,8 +42,14 @@ def show_one_movie(requets, slug_movie: str):
     })
 
 
+#
 
 
+# def director_movie(requets, slug_director: str):
+#     director = get_object_or_404(Director, slug=slug_director)
+#     return render(requets, 'movies_app/one_directors', {
+#         'director': director
+#     } )
 
     # # movie = Movie.objects.get(id=id_movie)
     # movie = get_object_or_404(Movie, slug=slug_movie)
